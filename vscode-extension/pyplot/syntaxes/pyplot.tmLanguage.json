@@ -1,0 +1,46 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "PyPlot",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comment"
+		},
+		{
+			"name": "constant.numeric.pyplot",
+			"match": "\\|"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.operator",
+					"match": "[-<>\\{\\}]"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.pyplot",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.pyplot",
+					"match": "\\\\(x[A-Fa-f0-9][A-Fa-f0-9]?|.)"
+				}
+			]
+		},
+		"comment": {
+			"name": "comment.line.pyplot",
+			"begin": "#",
+			"end": "$"
+		}
+	},
+	"scopeName": "source.pyplot"
+}
