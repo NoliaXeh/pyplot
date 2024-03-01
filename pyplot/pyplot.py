@@ -42,7 +42,7 @@ class Message:
 
     def __str__(self):
         direction = '<->' if self.bydirectional else '-->'
-        return f"[{self.order}] {self.sender}\t{direction}\t{self.receiver}\t: {self.content}"
+        return f"[{self.order}] {self.sender}\t{direction}\t{self.receiver}\t: {self.content!r}"
 
     def __repr__(self):
         return self.__str__().replace('\t', ' ')
@@ -78,7 +78,19 @@ class PlotParser:
 
     def parse_line(self, line: str):
         # Parse the line and add its message to the plot.
-        if '-' not in line:
+        if '-' not in line and self.plot.messages:
+            cnt = 0
+            for i, char in enumerate(line):
+                if char == '|':
+                    cnt += 1
+                if cnt == len(self.plot.actors):
+                    break
+            data = line[i + 1:]
+            if data and data[0] == ' ':
+                data = data[1:]
+            if data and data[0] == '#':
+                return
+            self.plot.messages[-1].content += '\n' + data
             return
         nb_columns_befor_message = -1
         nb_columns_after_message = 0
