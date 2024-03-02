@@ -89,6 +89,8 @@ class PlotParser:
                 data = data[1:]
             if data and data[0] == '#':
                 return
+            if not data:
+                return
             self.plot.messages[-1].content += '\n' + data
             return
         nb_columns_befor_message = -1
