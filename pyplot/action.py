@@ -1,3 +1,4 @@
+import jinja2
 from .pyplot import Message, Plot
 
 class ActionOverloadError(Exception):
@@ -22,13 +23,40 @@ def action(classDefinition):
     __plot_actions[classDefinition.__name__] = classDefinition
     return classDefinition
 
-def execute(plot: Plot):
+__templates = {}
+def template_action(classDefinition):
+    if not hasattr(classDefinition, 'trigger'):
+        if hasattr(classDefinition, 'message'):
+            message_title = classDefinition.message
+            def __match_title(plot, message):
+                return message_title == message.title
+            setattr(classDefinition, 'trigger', __match_title)
+
+    if not hasattr(classDefinition, 'execute'):
+        if hasattr(classDefinition, 'template'):
+            template_name = classDefinition.template
+            if template_name not in __templates:
+                __templates[template_name] = None
+            def __run_template(plot, message):
+                template = __templates[template_name]
+                return template.render(message=message) + '\n'
+            setattr(classDefinition, 'execute', __run_template)
+    return action(classDefinition)
+
+
+def play(plot: Plot):
     """
     Execute the actions for the given plot.
     """
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader("./"))
+    for template_name in __templates:
+        __templates[template_name] = environment.get_template(template_name)
+
+    result = ''
     for message in plot.messages:
         for action in __plot_actions.values():
             if action.trigger(plot, message):
-                action.execute(plot, message)
-                break
-    return plot
+                res = action.execute(plot, message)
+                if type(res) is str:
+                    result += res
+    return result

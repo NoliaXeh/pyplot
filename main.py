@@ -2,8 +2,6 @@ import pyplot
 
 def main():
     plot = pyplot.Plot("Scenario 1", "scenario.plot")
-    print(plot.title)
-    print(plot.filename)
     try:
         plot.parse()
     except pyplot.PlotError as e:
@@ -11,9 +9,9 @@ def main():
         print (e)
         return 1
 
-    pyplot.execute(plot)
+    print(pyplot.play(plot))
 
-@pyplot.action
+#@pyplot.action
 class PrintAction:
     @staticmethod
     def trigger(plot: pyplot.Plot, message: pyplot.Message) -> bool:
@@ -28,6 +26,24 @@ Message #{message.order + 1}: {message.title!r}
   | Content: {message.content}
   | Data: {message.data}\
 """)
+        
+def print_message(plot, message: pyplot.Message):
+    print(message)
+
+def trigger_if_message(plot, message: pyplot.Message):
+    return message.title.upper() == 'MESSAGE'
+
+@pyplot.action
+@pyplot.trigger_on_title('MESSAGE')
+@pyplot.execute(print_message)
+class PrintMessageAction:
+    pass
+
+
+@pyplot.template_action
+class TemplateAction:
+    message = "MESSAGE"
+    template = 'template.templ'
 
 
 if __name__ == '__main__':
