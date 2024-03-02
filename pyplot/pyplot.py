@@ -73,7 +73,6 @@ class PlotParser:
             except Exception as e:
                 print(f"Error parsing file {self.filename} : {line_no + 2}")
                 print(f"Invalid syntax:\n\t`{line}`")
-        print(*self.plot.messages, sep='\n')
         return self.plot
 
     def parse_line(self, line: str):
