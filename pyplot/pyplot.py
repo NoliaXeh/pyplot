@@ -2,10 +2,25 @@
 
 from dataclasses import dataclass
 import re
+import json
 
 class PlotError(Exception):
-    def __init__(self, message):
+    def __init__(self, message, char_number: int = None, line = None):  
         self.message = message
+        self.char_number = char_number
+        self.line = line
+
+    @property
+    def details(self):
+        if self.char_number is None:
+            return f"Error: {self.message}"
+        return \
+        f"Error: {self.message} at char {self.char_number}:\n" + \
+        f"{self.line!r}\n" + \
+        f"{' ' * self.char_number}^"
+
+    def __str__(self):
+        return self.details
 
 class Plot:
     """
@@ -38,7 +53,10 @@ class Message:
     receiver: str
     bydirectional: bool
     content: str
+    line: int
     order: int = 0
+    title: str = None
+    data: dict[str, str] = None
 
     def __str__(self):
         direction = '<->' if self.bydirectional else '-->'
@@ -63,21 +81,40 @@ class PlotParser:
         # Parse the messages. They are the rest of the file.
         for line_no, line in enumerate(self.data[1:]):
             try:
-                self.parse_line(line)
-
+                self.parse_line(line, line_no)
             except PlotError as e:
-                print(f"Error parsing file {self.filename} : {line_no + 2}")
-                print(e.message)
-                print(line)
+                print(f"Error parsing file {self.filename}, line {line_no + 2}")
+                print(e.details)
                 raise e
             except Exception as e:
                 print(f"Error parsing file {self.filename} : {line_no + 2}")
                 print(f"Invalid syntax:\n\t`{line}`")
+                raise e
+
+        for message in self.plot.messages:
+            # extract the json data from the message content, if any
+            if '{' not in message.content:
+                title = message.content.strip().split(' ')[0] if ' ' in message.content else message.content
+                message.title = title
+                message.content = message.content.strip()[len(title):].strip()
+                message.data = {}
+                continue
+            if '}' not in message.content:
+                raise PlotError("invalid json data, no ending }", char_number=len(message.content), line=message.content)
+            json_start = message.content.find('{')
+            json_end = message.content.find('}')
+            json_raw = message.content[json_start:json_end + 3]
+            try:
+                message.data = json.loads(json_raw)
+            except json.JSONDecodeError as e:
+                raise PlotError(f"invalid json data for message line line {message.line}: \n {e.msg}", char_number=json_start, line=json_raw)
+            message.title = message.content[:json_start].strip()
         return self.plot
 
-    def parse_line(self, line: str):
+    def parse_line(self, line: str, line_no: int):
         # Parse the line and add its message to the plot.
-        if '-' not in line and self.plot.messages:
+        regex_line_is_new_message = re.compile(r"\|.*-.*\|.*")
+        if not re.match(regex_line_is_new_message, line) and self.plot.messages:
             cnt = 0
             for i, char in enumerate(line):
                 if char == '|':
@@ -106,7 +143,7 @@ class PlotParser:
                 nb_columns_befor_message += 1
             elif char == '-':
                 if arrow_ended:
-                    raise PlotError("Error: multiple arrows in the same line")
+                    raise PlotError("multiple arrows in the same line", char_number=i, line=line)
                 message_found = True
             elif char == '>':
                 message_direction += '>'
@@ -118,12 +155,15 @@ class PlotParser:
             if message_found and char != '-':
                 arrow_ended = True
         else:
-            end_of_columns = len(line) - 1 
+            end_of_columns = len(line) - 1
         if not message_found:
             return
         # data is after the last '|'
         if nb_columns_after_message > 0:
             data = line[end_of_columns + 1:]
+
+        if not data:
+            raise PlotError("no message content. If you want no operation, use `#` to indicate it wasn't a mistake.", char_number=end_of_columns, line=line)
 
         index_left_actor = nb_columns_befor_message
         index_right_actor = len(self.plot.actors) - nb_columns_after_message
@@ -132,12 +172,21 @@ class PlotParser:
         right = self.plot.actors[index_right_actor]
         order = len(self.plot.messages)
         if message_direction in ('<>', '><'):
-            message = Message(left, right, True, data, order)
+            sender = left
+            receiver = right
+            bydirectional = True
         elif message_direction == '>':
-            message = Message(left, right, False, data, order)
+            sender = left
+            receiver = right
+            bydirectional = False
         elif message_direction == '<':
-            message = Message(right, left, False, data, order)
+            sender = right
+            receiver = left
+            bydirectional = False
         else:
-            message = Message(left, right, True, data, order)
+            sender = left
+            receiver = right
+            bydirectional = True
 
+        message = Message(sender=sender, receiver=receiver, bydirectional=bydirectional, content=data, order=order, line=line_no+2)
         self.plot.messages.append(message)
