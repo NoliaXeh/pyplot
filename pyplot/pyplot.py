@@ -5,6 +5,10 @@ import re
 import json
 
 class PlotError(Exception):
+    """
+    Custom exception class for plotting errors.
+    """
+
     def __init__(self, message, char_number: int = None, line = None):  
         self.message = message
         self.char_number = char_number
@@ -26,8 +30,18 @@ class Plot:
     """
     A class to represent a plot.
     A plot is a visual representation of a scenario, resembling a sequence diagram.
-    """
 
+    Attributes:
+        title (str): The title of the plot.
+        filename (str): The filename of the plot.
+        actors (list): A list of actors in the plot.
+        messages (list): A list of messages in the plot.
+        parser (PlotParser): The parser used to parse the plot file.
+
+    Methods:
+        __init__(self, title: str, filename: str): Initializes a new Plot object.
+        parse(self): Parses the plot file using the parser.
+    """
     def __init__(self, title: str, filename: str):
         self.title = title
         self.filename = filename
@@ -40,6 +54,10 @@ class Plot:
 
 @dataclass
 class Actor:
+    """
+    Represents an actor in a plot
+    """
+
     name: str
     column: int
     data: dict[str, str] = None
@@ -49,8 +67,22 @@ class Actor:
 
 @dataclass
 class Message:
-    sender: str
-    receiver: str
+    """
+    Represents a message between two actors.
+
+    Attributes:
+        sender (str): The sender of the message.
+        receiver (str): The receiver of the message.
+        bydirectional (bool): Indicates if the message is bidirectional.
+        content (str): The content of the message.
+        line (int): The line number of the message.
+        order (int, optional): The order of the message. Defaults to 0.
+        title (str, optional): The title of the message. Defaults to None.
+        data (dict[str, str], optional): Additional data associated with the message. Defaults to None.
+    """
+
+    sender: Actor
+    receiver: Actor
     bydirectional: bool
     content: str
     line: int
@@ -66,13 +98,51 @@ class Message:
         return self.__str__().replace('\t', ' ')
 
 class PlotParser:
+    """
+    A class that parses data from a file and constructs a plot object.
+
+    Attributes:
+        filename (str): The path of the file to be parsed.
+        plot (Plot): The plot object to be constructed.
+        data (List[str]): The data read from the file.
+
+    Methods:
+        __init__(self, filename: str, plot: Plot):
+            Initializes the PlotParser object.
+        parse(self) -> Plot:
+            Parses the data in the file and constructs a plot object.
+        parse_line(self, line: str, line_no: int):
+            Parses a single line and adds its message to the plot.
+        append_data_to_previous_message(self, line: str):
+            Appends data to the previous message in the plot.
+        get_column_counts(self, line: str) -> tuple[int, int, bool, bool, str, int]:
+            Gets the column counts and message direction from a line.
+        extract_data(self, line: str, end_of_columns: int, nb_columns_after_message: int) -> str | None:
+            Extracts the data from a line.
+        get_sender_receiver_direction(self, nb_columns_befor_message: int, nb_columns_after_message: int, message_direction: str) -> tuple[Actor, Actor, bool]:
+            Gets the sender, receiver, and direction of a message.
+    """
+
     def __init__(self, filename: str, plot: Plot):
+        """
+        Initializes the PlotParser object.
+
+        Args:
+            filename (str): The path of the file to be parsed.
+            plot (Plot): The plot object to be constructed.
+        """
         self.filename = filename
         with open(filename, 'r') as file:
             self.data = file.read().split("\n")
         self.plot = plot
 
-    def parse(self):
+    def parse(self) -> Plot:
+        """
+        Parses the data in the file and constructs a plot object.
+
+        Returns:
+            Plot: The constructed plot object.
+        """
         # Parse the actors. They are the first line of the file, speparated by multiple spaces.
         actors = self.data[0].split(" ")
         regex_actors = re.compile(r"[A-Za-z0-9_-]+")
@@ -92,44 +162,104 @@ class PlotParser:
                 raise e
 
         for message in self.plot.messages:
-            # extract the json data from the message content, if any
-            if '{' not in message.content:
-                title = message.content.strip().split(' ')[0] if ' ' in message.content else message.content
-                message.title = title
-                message.content = message.content.strip()[len(title):].strip()
-                message.data = {}
-                continue
-            if '}' not in message.content:
-                raise PlotError("invalid json data, no ending }", char_number=len(message.content), line=message.content)
-            json_start = message.content.find('{')
-            json_end = message.content.find('}')
-            json_raw = message.content[json_start:json_end + 3]
-            try:
-                message.data = json.loads(json_raw)
-            except json.JSONDecodeError as e:
-                raise PlotError(f"invalid json data for message line line {message.line}: \n {e.msg}", char_number=json_start, line=json_raw)
-            message.title = message.content[:json_start].strip()
+            self.extract_json_data(message)
         return self.plot
 
+    def extract_json_data(self, message: Message):
+        """
+        Extracts JSON data from the message content and updates the message object.
+
+        Args:
+            message (Message): The message object containing the content to extract JSON data from.
+
+        Raises:
+            PlotError: If the JSON data is invalid or incomplete.
+
+        Returns:
+            None
+        """
+        # extract the json data from the message content, if any
+        if '{' not in message.content:
+            title = message.content.strip().split(' ')[0] if ' ' in message.content else message.content
+            message.title = title
+            message.content = message.content.strip()[len(title):].strip()
+            message.data = {}
+            return
+        if '}' not in message.content:
+            raise PlotError("invalid json data, no ending }", char_number=len(message.content), line=message.content)
+        json_start = message.content.find('{')
+        json_end = message.content.find('}')
+        json_raw = message.content[json_start:json_end + 3]
+        try:
+            message.data = json.loads(json_raw)
+        except json.JSONDecodeError as e:
+            raise PlotError(f"invalid json data for message line line {message.line}: \n {e.msg}", char_number=json_start, line=json_raw)
+        message.title = message.content[:json_start].strip()
+
     def parse_line(self, line: str, line_no: int):
-        # Parse the line and add its message to the plot.
+        """
+        Parses a single line and adds its message to the plot.
+
+        Args:
+            line (str): The line to be parsed.
+            line_no (int): The line number.
+
+        Raises:
+            PlotError: If there is an error parsing the line.
+        """
         regex_line_is_new_message = re.compile(r"\|.*-.*\|.*")
         if not re.match(regex_line_is_new_message, line) and self.plot.messages:
-            cnt = 0
-            for i, char in enumerate(line):
-                if char == '|':
-                    cnt += 1
-                if cnt == len(self.plot.actors):
-                    break
-            data = line[i + 1:]
-            if data and data[0] == ' ':
-                data = data[1:]
-            if data and data[0] == '#':
-                return
-            if not data:
-                return
-            self.plot.messages[-1].content += '\n' + data
+            self.append_data_to_previous_message(line)
             return
+        nb_columns_befor_message, nb_columns_after_message, message_found, arrow_ended, message_direction, end_of_columns = self.get_column_counts(line)
+        if not message_found:
+            return
+        data = self.extract_data(line, end_of_columns, nb_columns_after_message)
+        if not data:
+            raise PlotError("no message content. If you want no operation, use `#` to indicate it wasn't a mistake.", char_number=end_of_columns, line=line)
+        sender, receiver, bydirectional = self.get_sender_receiver_direction(nb_columns_befor_message, nb_columns_after_message, message_direction)
+        order = len(self.plot.messages)
+        message = Message(sender=sender, receiver=receiver, bydirectional=bydirectional, content=data, order=order, line=line_no+2)
+        self.plot.messages.append(message)
+
+    def append_data_to_previous_message(self, line: str):
+        """
+        Appends data to the previous message in the plot.
+
+        Args:
+            line (str): The line containing the data to be appended.
+        """
+        cnt = 0
+        for i, char in enumerate(line):
+            if char == '|':
+                cnt += 1
+            if cnt == len(self.plot.actors):
+                break
+        data = line[i + 1:]
+        if data and data[0] == ' ':
+            data = data[1:]
+        if data and data[0] == '#':
+            return
+        if not data:
+            return
+        self.plot.messages[-1].content += '\n' + data
+
+    def get_column_counts(self, line: str) -> tuple[int, int, bool, bool, str, int]:
+        """
+        Gets the column counts and message direction from a line.
+
+        Args:
+            line (str): The line to be analyzed.
+
+        Returns:
+            tuple[int, int, bool, bool, str, int]: A tuple containing:
+                - The number of columns before the message.
+                - The number of columns after the message.
+                - A boolean indicating if a message was found.
+                - A boolean indicating if the arrow ended.
+                - The direction of the message.
+                - The index of the end of the columns.
+        """
         nb_columns_befor_message = -1
         nb_columns_after_message = 0
         message_found = False
@@ -156,21 +286,41 @@ class PlotParser:
                 arrow_ended = True
         else:
             end_of_columns = len(line) - 1
-        if not message_found:
-            return
-        # data is after the last '|'
+        return nb_columns_befor_message, nb_columns_after_message, message_found, arrow_ended, message_direction, end_of_columns
+
+
+    def extract_data(self, line: str, end_of_columns: int, nb_columns_after_message: int) -> str | None:
+        """
+        Extracts the data from a line.
+
+        Args:
+            line (str): The line to extract data from.
+            end_of_columns (int): The index of the end of columns.
+            nb_columns_after_message (int): The number of columns after the message.
+
+        Returns:
+            str | None: The extracted data, or None if no data is found.
+        """
         if nb_columns_after_message > 0:
             data = line[end_of_columns + 1:]
+            return data
+        return None
+    def get_sender_receiver_direction(self, nb_columns_befor_message: int, nb_columns_after_message: int, message_direction: str) -> tuple[Actor, Actor, bool]:
+        """
+        Gets the sender, receiver, and direction of a message.
 
-        if not data:
-            raise PlotError("no message content. If you want no operation, use `#` to indicate it wasn't a mistake.", char_number=end_of_columns, line=line)
+        Args:
+            nb_columns_befor_message (int): The number of columns before the message.
+            nb_columns_after_message (int): The number of columns after the message.
+            message_direction (str): The direction of the message.
 
+        Returns:
+            tuple[Actor, Actor, bool]: A tuple containing the sender, receiver, and direction of the message.
+        """
         index_left_actor = nb_columns_befor_message
         index_right_actor = len(self.plot.actors) - nb_columns_after_message
-
         left = self.plot.actors[index_left_actor]
         right = self.plot.actors[index_right_actor]
-        order = len(self.plot.messages)
         if message_direction in ('<>', '><'):
             sender = left
             receiver = right
@@ -187,6 +337,4 @@ class PlotParser:
             sender = left
             receiver = right
             bydirectional = True
-
-        message = Message(sender=sender, receiver=receiver, bydirectional=bydirectional, content=data, order=order, line=line_no+2)
-        self.plot.messages.append(message)
+        return sender, receiver, bydirectional
