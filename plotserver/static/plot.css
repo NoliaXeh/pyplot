@@ -1,0 +1,103 @@
+
+.messages {
+    min-width: 500px;
+}
+
+.actors,
+.message {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(var(--nb-actors), 1fr);
+    position: relative;
+}
+
+.message:hover {
+    background-color: #98ccff;
+}
+
+.message:hover .arrow {
+    border-color: #98ccff;
+}
+.actor,
+.plot-column {
+    height: 50px;
+    position: relative;
+    text-align: center;
+}
+
+.arrow {
+    border-top: 3px solid var(--bg-color);
+    border-bottom: 3px solid var(--bg-color);
+    height: 8px;
+    display: none;
+    position: absolute;
+    top: calc(50% - 0px);
+    background-color: var(--arrow-color);
+}
+
+.line, .arrow {
+    --spacing: 6px;
+    --arrow-color: #51585f;
+}
+
+.plot-column.left .arrow {
+    /* draw a line */
+    content: '';
+    left: calc(50% + var(--spacing));
+    width: calc(50% - var(--spacing));
+    z-index: 1;
+    display: block;
+}
+
+.plot-column.right .arrow {
+    /* draw a line */
+    content: '';
+    right: calc(50% + var(--spacing));
+    width: calc(50% - var(--spacing));
+    z-index: 1;
+    display: block;
+}
+
+.plot-column.between .arrow {
+    /* draw a line */
+    content: '';
+    right: 0;
+    width: 100%;
+    z-index: 1;
+    display: block;
+}
+
+.plot-column .line {
+    /* draw a line */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(50% - 2px);
+    width: 4px;
+    height: 100%;
+    background-color: #4aa4ff;
+}
+
+.plot-column.right[plt-receiver] .line::after,
+.plot-column.right[plt-bydirectional] .line::after {
+    content : ">";
+    z-index: 2;
+    position: absolute;
+    top: calc(50% + 3.5px);
+    left: calc(50% - 5px - var(--spacing));
+    transform: translate(-50%, -50%);
+    color: var(--arrow-color);
+    font-size: 1.5rem;
+}
+
+.plot-column.left[plt-receiver] .line::before,
+.plot-column.left[plt-bydirectional] .line::before {
+    content : "<";
+    z-index: 2;
+    position: absolute;
+    top: calc(50% + 3.5px);
+    left: calc(50% + 3px + var(--spacing));
+    transform: translate(-50%, -50%);
+    color: var(--arrow-color);
+    font-size: 1.5rem;
+}

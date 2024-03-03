@@ -1,0 +1,49 @@
+<div class="plot" id="plot-{{plot.id}}">
+    <style> #plot-{{plot.id}} * { --nb-actors: {{plot.actors|length}}; } </style>
+    <h2>Plot {{plot.title}}</h2>
+    <div class="actors">
+        {% for actor in plot.actors %}
+            <div class="actor">
+                {{actor.name}}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="messages">
+    {% for message in plot.messages %}
+        <div class="message"
+            hx-get="/message-edit/{{plot.id}}/{{message.order}}"
+            hx-target=".options-pannel"
+            hx-trigger="click">
+            {% for actor in plot.actors %}
+                <div
+                    {% if actor == message.left %}
+                        class="plot-column left"
+                        plt-from="{{actor.column}}"
+                    {% elif actor == message.right %}
+                        class="plot-column right"
+                        plt-to="{{actor.column}}"
+                    {% elif actor.column < message.left.column %}
+                        class="plot-column before"
+                    {% elif actor.column > message.right.column %}
+                        class="plot-column after"
+                    {% else %}
+                        class="plot-column between"
+                    {% endif %}
+                    {% if actor == message.sender %}
+                        plt-sender="{{actor.column}}"
+                    {% endif %}
+                    {% if actor == message.receiver %}
+                        plt-receiver="{{actor.column}}"
+                    {% endif %}
+                    {% if message.bydirectional and actor in (message.receiver, message.sender) %}
+                        plt-bydirectional="true"
+                    {% endif %}
+                    >
+                <div class="line"></div>
+                <div class="arrow"></div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+</div>

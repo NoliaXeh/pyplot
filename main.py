@@ -13,7 +13,7 @@ def main():
 
     print(pyplot.play(plot))
 
-#@pyplot.action
+@pyplot.action
 class PrintAction:
     @staticmethod
     def trigger(plot: pyplot.Plot, message: pyplot.Message) -> bool:

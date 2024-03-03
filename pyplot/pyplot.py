@@ -42,12 +42,15 @@ class Plot:
         __init__(self, title: str, filename: str): Initializes a new Plot object.
         parse(self): Parses the plot file using the parser.
     """
+    __id = 0
     def __init__(self, title: str, filename: str):
         self.title = title
         self.filename = filename
         self.actors = []
         self.messages = []
         self.parser = PlotParser(filename, self)
+        self.id = Plot.__id
+        Plot.__id += 1
 
     def parse(self):
         self.parser.parse()
@@ -153,6 +156,18 @@ class Message:
     order: int = 0
     title: str = None
     data: dict[str, str] = None
+
+    @property
+    def left(self):
+        if self.sender.column < self.receiver.column:
+            return self.sender
+        return self.receiver
+
+    @property
+    def right(self):
+        if self.sender.column > self.receiver.column:
+            return self.sender
+        return self.receiver
 
     def __str__(self):
         direction = '<->' if self.bydirectional else '-->'
