@@ -26,7 +26,7 @@ Message #{message.order + 1}: {message.title!r}
   | Content: {message.content}
   | Data: {message.data}\
 """)
-        
+
 def print_message(plot, message: pyplot.Message):
     print(message)
 
