@@ -1,7 +1,7 @@
 import pyplot
 
 def main():
-    plot = pyplot.Plot("Scenario 1", "scenario.plot")
+    plot = pyplot.Plot("Scenario 1", "scenarios/scenario.plot")
     try:
         plot.parse()
     except pyplot.PlotError as e:
@@ -20,7 +20,7 @@ class PrintAction:
     @staticmethod
     def execute(plot: pyplot.Plot, message: pyplot.Message):
         print(f"""\
-Message #{message.order + 1}: {message.title!r} 
+Message #{message.order + 1}: {message.title!r}
   | From: {message.sender}
   | To: {message.receiver}
   | Content: {message.content}
@@ -43,7 +43,7 @@ class PrintMessageAction:
 @pyplot.template_action
 class TemplateAction:
     message = "MESSAGE"
-    template = 'template.templ'
+    template = 'templates/template.templ'
 
 
 if __name__ == '__main__':
