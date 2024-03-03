@@ -52,6 +52,23 @@ class Plot:
     def parse(self):
         self.parser.parse()
 
+    def set_actor_data(self, data: dict[str, str], actor_name: str) -> bool:
+        """
+        Sets the data for an actor in the plot.
+
+        Args:
+            data (dict[str, str]): The data to be set.
+            actor_name (str): The name of the actor.
+
+        Returns:
+            bool: True if the actor was found and the data was set, False otherwise.
+        """
+        for actor in self.actors:
+            if actor.name == actor_name:
+                actor.data = data
+                return True
+        return False
+
 @dataclass
 class Actor:
     """
