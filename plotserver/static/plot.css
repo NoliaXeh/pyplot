@@ -101,3 +101,15 @@
     color: var(--arrow-color);
     font-size: 1.5rem;
 }
+
+.from_to {
+    display: flex;
+    gap: 5px;
+    margin: 5px 0;
+}
+
+.from_to > i {
+    width: 30px;
+    position: relative;
+    top: 10px;
+}

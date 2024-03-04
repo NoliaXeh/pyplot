@@ -127,6 +127,7 @@ class Actor:
 
     name: str
     column: int
+    plot: Plot
     data: dict[str, str] = None
 
     def __str__(self):
@@ -226,7 +227,7 @@ class PlotParser:
         actors = self.data[0].split(" ")
         regex_actors = re.compile(r"[A-Za-z0-9_-]+")
         actors = regex_actors.findall(self.data[0])
-        self.plot.actors = [Actor(actor, index) for index, actor in enumerate(actors)]
+        self.plot.actors = [Actor(actor, index, self.plot) for index, actor in enumerate(actors)]
         # Parse the messages. They are the rest of the file.
         for line_no, line in enumerate(self.data[1:]):
             try:
