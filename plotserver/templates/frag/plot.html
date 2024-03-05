@@ -1,6 +1,5 @@
 <div class="plot" id="plot-{{plot.id}}">
     <style> #plot-{{plot.id}} * { --nb-actors: {{plot.actors|length}}; } </style>
-    <h2>Plot {{plot.title}}</h2>
     <div class="actors">
         {% for actor in plot.actors %}
             <div class="actor">

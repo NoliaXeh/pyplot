@@ -8,6 +8,8 @@ from urllib.parse import parse_qs
 
 from .templates import get_template
 
+import os
+
 import pyplot
 
 def to_int(s: str) -> int | None:
@@ -79,3 +81,14 @@ async def message_edit_from_to(request):
     resp = template.render(plot=plot)
 
     return HTMLResponse(resp)
+
+async def plot_explore(request):
+    # recursivly search for .plot or .pyplot files
+    def find_files(path):
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if file.endswith(".plot") or file.endswith(".pyplot"):
+                    yield os.path.join(root, file)
+    files = list(find_files("scenarios"))
+
+    

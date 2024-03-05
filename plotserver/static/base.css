@@ -161,7 +161,7 @@ fieldset {
 
 main {
     display: grid;
-    grid-template-columns: 1fr 450px;
+    grid-template-columns: 250px 1fr 450px;
     min-height: 100vh;
 }
 
@@ -171,6 +171,13 @@ main {
     background-color: var(--bg-color-light);
 }
 
+.side-pannel {
+    padding: 1rem;
+    border-right: 1px solid #e0e0e0;
+    background-color: var(--bg-color-light);
+}
+
+
 input, textarea {
     width: 100%;
     border: 1px solid #e0e0e0;
@@ -179,4 +186,39 @@ input, textarea {
 
 textarea {
     min-height: 400px;
+}
+
+topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--bg-color-light);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+topbar h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+topbar a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+topbar a:hover {
+    text-decoration: underline;
+}
+
+topbar a:active {
+    color: #0056b3;
+}
+
+topbar a:visited {
+    color: #4c2c92;
+}
+
+topbar a:visited:hover {
+    text-decoration: underline;
 }
