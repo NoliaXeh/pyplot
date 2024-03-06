@@ -1,6 +1,6 @@
 
 .messages {
-    min-width: 500px;
+    /* min-width: 500px; */
 }
 
 .actors,
@@ -9,10 +9,16 @@
     display: grid;
     grid-template-columns: repeat(var(--nb-actors), 1fr);
     position: relative;
+    box-sizing: content-box;
 }
 
 .message:hover {
     background-color: #98ccff;
+}
+
+.message.selected {
+    outline: 1px solid #4aa4ff;
+    outline-style: dashed;
 }
 
 .message:hover .arrow {

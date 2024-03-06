@@ -172,7 +172,7 @@ main {
 }
 
 .side-pannel {
-    padding: 1rem;
+    padding: 5px;
     border-right: 1px solid #e0e0e0;
     background-color: var(--bg-color-light);
 }
@@ -221,4 +221,22 @@ topbar a:visited {
 
 topbar a:visited:hover {
     text-decoration: underline;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #98ccff;
+}
+
+button:has(> i) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

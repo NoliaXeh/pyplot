@@ -1,0 +1,16 @@
+<div class='file-explorer'>
+    <div class='buttons'>
+        <button id="new-file"><i class="fas fa-file"></i></button>
+        <button id="refresh"
+            hx-get='/plot-explore'
+            hx-target='.file-explorer'
+            ><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a class="{% if selected_file == file %}selected{%endif%}" href="/?file={{ file }}">{{ file }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

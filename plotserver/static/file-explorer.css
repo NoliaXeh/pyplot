@@ -1,0 +1,46 @@
+
+.file-explorer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.file-explorer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.file-explorer ul li {
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.file-explorer ul li:hover {
+  background-color: #f0f0f0;
+}
+
+.file-explorer ul li a {
+  display: block;
+  padding: 2px 5px;
+  margin: 5px 0 ;
+  text-decoration: none;
+  color: inherit;
+  overflow-x: hidden;
+}
+
+.file-explorer .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.file-explorer a.selected {
+  background-color: #98ccff;
+}

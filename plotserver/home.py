@@ -23,16 +23,21 @@ current_plot = None
 
 def get_plot():
     global current_plot
-    if current_plot is None:
-        current_plot = pyplot.Plot("Scenario 1", "scenarios/scenario.plot")
-        try:
-            current_plot.parse()
-        except pyplot.PlotError as e:
-            return HTMLResponse(f"Error parsing file. Exiting. <br> <pre>{e}</pre>")
     return current_plot
 
 
 async def homepage(request):
+    # get the 'file' query parameter
+    query_params = parse_qs(request.url.query)
+    file = query_params.get('file', [None])[0]
+    if file is not None:
+        global current_plot
+        current_plot = pyplot.Plot("Scenario 1", file)
+        try:
+            current_plot.parse()
+        except pyplot.PlotError as e:
+            return HTMLResponse(f"Error parsing file. Exiting. <br> <pre>{e}</pre>")
+
     plot = get_plot()
     if type(plot) is HTMLResponse:
         return plot
@@ -91,4 +96,7 @@ async def plot_explore(request):
                     yield os.path.join(root, file)
     files = list(find_files("scenarios"))
 
-    
+    template = get_template('frag/plot-explorer.html')
+
+    resp = template.render(files=files, selected_file=current_plot.filename if current_plot is not None else None)
+    return HTMLResponse(resp)
