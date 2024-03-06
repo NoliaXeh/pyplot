@@ -12,18 +12,29 @@
     box-sizing: content-box;
 }
 
-.message:hover {
-    background-color: #98ccff;
+.message, .message * {
+    --selected-color: #a9d4ff;
+    --hover-color: #d2e8ff;
+    transition: all 0.15s;
+    cursor: pointer;
 }
 
-.message.selected {
-    outline: 1px solid #4aa4ff;
-    outline-style: dashed;
+.message:hover {
+    background-color: var(--hover-color);
 }
 
 .message:hover .arrow {
-    border-color: #98ccff;
+    border-color: var(--hover-color);
 }
+
+.message.selected {
+    background-color: var(--selected-color);
+}
+
+.message.selected .arrow {
+    border-color: var(--selected-color);
+}
+
 .actor,
 .plot-column {
     height: 50px;

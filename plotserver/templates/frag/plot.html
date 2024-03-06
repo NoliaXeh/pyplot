@@ -9,10 +9,11 @@
     </div>
     <div class="messages">
     {% for message in plot.messages %}
-        <div class="message"
+        <div class="message" id="message-{{message.order}}"
             hx-get="/message-edit/{{plot.id}}/{{message.order}}"
             hx-target=".options-pannel"
-            hx-trigger="click">
+            hx-trigger="click"
+            hx-on:click="select_message({{message.order}})">
             {% for actor in plot.actors %}
                 <div
                     {% if actor == message.left %}
@@ -45,4 +46,11 @@
         </div>
     {% endfor %}
     </div>
+    <script>
+        function select_message(order) {
+            console.log('select_message', order);
+            document.querySelector('.message.selected')?.classList.remove('selected');
+            document.querySelector(`#message-${order}`).classList.add('selected');
+        }
+    </script>
 </div>
