@@ -1,5 +1,13 @@
 <div>
-    <h1> {{ message.title }} </h1>
+    <form
+        hx-post="/message-edit/title"
+        hx-trigger="change"
+        hx-ext="json-enc"
+        hx-target=".plot-pannel"
+    >
+        <input type="hidden" name="order" value="{{message.order}}"></input>
+        <h1><input name="title" value="{{ message.title }}"/> </h1>
+    </form>
     <form class="from_to"
         hx-post="/message-edit/from_to"
         hx-trigger="change"
@@ -9,16 +17,30 @@
         <input type="hidden" name="order" value="{{message.order}}"></input>
         <select name="from" id="from-actors-select">
             {% for actor in message.sender.plot.actors %}
-                <option value="{{ actor.column }}" {% if actor.column == message.sender.column %} selected {% endif %} >{{ actor }}</option>
+            <option value="{{ actor.column }}" {% if actor.column == message.sender.column %} selected {% endif %} >{{ actor }}</option>
             {% endfor %}
         </select>
         <i class="fa-solid fa-arrow-right"></i>
         <select name="to" id="to-actors-select">
             {% for actor in message.sender.plot.actors %}
-                <option value="{{ actor.column }}" {% if actor.column == message.receiver.column %} selected {% endif %} >{{ actor }}</option>
+            <option value="{{ actor.column }}" {% if actor.column == message.receiver.column %} selected {% endif %} >{{ actor }}</option>
             {% endfor %}
         </select>
     </form>
-
-    <textarea>{{message.data|json}}</textarea>
+    <form
+        hx-post="/message-edit/data"
+        hx-trigger="change"
+        hx-ext="json-enc"
+        hx-target=".plot-pannel"
+    >
+        <input type="hidden" name="order" value="{{message.order}}"></input>
+        <textarea name="data">{{message.data|json}}</textarea>
+    </form>
+    <button class="red"
+        hx-get="/message-edit/delete/{{message.order}}"
+        hx-target=".plot-pannel"
+        hx-on:click="clear_options()"
+    >
+        <i class="fa-solid fa-trash"></i> <span>Supprimer le message</span>
+    </button>
 </div>

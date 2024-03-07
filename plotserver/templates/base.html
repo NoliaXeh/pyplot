@@ -13,13 +13,10 @@
 <body>
     <topbar>
         <div class="topbar">
-            <div class="logo">
-                <a href="/">My Website</a>
-            </div>
-            <div class="menu">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-            </div>
+            <button hx-get="/message-new" hx-target=".plot-pannel">
+                <i class="fa-solid fa-arrows-left-right-to-line"></i>
+                <span> Créer un message </span>
+            </button>
         </div>
     </topbar>
     <main>

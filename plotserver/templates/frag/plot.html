@@ -56,7 +56,11 @@
                 <div class="arrow"></div>
                 </div>
             {% endfor %}
-        </div>
+            <div class="top_down">
+                {% if message.order != 0 %}<i class="fa-solid fa-caret-up" hx-get="/message-edit/move-up/{{message.order}}" hx-target=".plot-pannel"></i> {% endif %}
+                {% if message.order != plot.messages|length - 1 %}<i class="fa-solid fa-caret-down" hx-get="/message-edit/move-down/{{message.order}}" hx-target=".plot-pannel"></i> {% endif %}
+            </div>
+    </div>
     {% endfor %}
     </div>
     <script>

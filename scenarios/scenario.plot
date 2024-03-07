@@ -1,6 +1,6 @@
-Client         Server         Proxy         Random         Random
+Client         Proxy         Server         Random         Random
 |               |               |               |               |
-|               |<------------------------------|               | MESSAGE {
+|------------------------------>|               |               | MESSAGES {
 |               |               |               |               |     "type": "REQUEST",
 |               |               |               |               |     "method": "GET",
 |               |               |               |               |     "url": "http://www.google.com",
@@ -13,8 +13,6 @@ Client         Server         Proxy         Random         Random
 |               |               |               |               |     }
 |               |               |               |               | }
 |               |               |               |               |
-|-------------------------------------------------------------->| # 
-|               |               |               |               |
 |               |               |               |<--------------| MESSAGE {
 |               |               |               |               |     "key": "value"
 |               |               |               |               | }
@@ -23,13 +21,17 @@ Client         Server         Proxy         Random         Random
 |               |               |               |               |     "data": "value"
 |               |               |               |               | }
 |               |               |               |               |
-|<--------------------------------------------------------------| RESPONSE Pas de fleches, c'est la suite du message précédent
+|               |<----------------------------------------------| RESPONSE Pas de fleches, c'est la suite du message précédent
 |               |               |               |               |
 |<------------------------------------------------------------->| LINKS Je ne sais plus quoi mettre
+|               |               |               |               |
+|-------------------------------------------------------------->| TOTO 
 |               |               |               |               |
 |<----------------------------------------------|               | TEST 
 |               |               |               |               |
 |               |               |               |-------------->| TEST "blabla"
+|               |               |               |               |
+|-------------------------------------------------------------->| NEW NEW MESSAGE
 |               |               |               |               |
 |<------------------------------------------------------------->| Burp 
 |               |               |               |               |

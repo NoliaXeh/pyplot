@@ -35,6 +35,24 @@
     border-color: var(--selected-color);
 }
 
+.message .top_down {
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+.message .top_down i {
+    opacity: 40%;
+}
+.message .top_down i:hover  {
+    opacity: 100%;
+}
+.message:hover .top_down {
+    display: grid;
+}
+
 .actor,
 .plot-column {
     height: 50px;

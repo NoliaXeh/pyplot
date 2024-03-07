@@ -235,6 +235,10 @@ button:hover {
     background-color: #98ccff;
 }
 
+button.red:hover {
+    background-color: #ffa498;
+}
+
 button:has(> i) {
     display: flex;
     justify-content: center;
@@ -247,4 +251,8 @@ button:has(> i) {
     align-items: center;
     padding: 1rem;
     border-bottom: 1px solid #e0e0e0;
+}
+
+button i + span {
+    margin-left: 1em;
 }

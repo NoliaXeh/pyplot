@@ -1,3 +1,4 @@
+import json
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse, HTMLResponse
 from starlette.routing import Route
@@ -108,6 +109,33 @@ async def actor_edit_move_right(request):
 
     return HTMLResponse(resp)
 
+async def message_new(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+    if plot is None:
+        return HTMLResponse("not found", status_code=404)
+
+    message = pyplot.Message(
+        plot.actors[0],
+        plot.actors[-1],
+        False,
+        'NEW MESSAGE',
+        -1,
+        len(plot.messages),
+        "NEW MESSAGE",
+        {}
+    )
+
+    plot.messages.append(message)
+
+    plot.save()
+
+    template = get_template('frag/plot.html')
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
 
 async def message_edit(request):
     plot = get_plot()
@@ -149,6 +177,123 @@ async def message_edit_from_to(request):
     resp = template.render(plot=plot)
 
     return HTMLResponse(resp)
+
+async def message_edit_title(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    body = await request.json()
+    order = to_int(body.get('order'))
+    title = body.get('title')
+
+    if None in (order, title):
+        return HTMLResponse("not found", status_code=404)
+    
+    plot.messages[order].title = title
+    plot.save()
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+async def message_edit_data(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    body = await request.json()
+    order = to_int(body.get('order'))   
+    data = body.get('data')
+
+    if data is not None:
+        try:
+            data = json.loads(data)
+        except:
+            data = None
+
+    if None in (order, data):
+        return HTMLResponse("not found", status_code=404)
+    
+    plot.messages[order].data = data
+    plot.save()
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+async def message_edit_delete(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    order = request.path_params.get('msg_order')
+    if order is None:
+        return HTMLResponse("not found", status_code=404)
+    
+    plot.messages.pop(order)
+    for i, message in enumerate(plot.messages):
+        message: pyplot.Message
+        message.order = i
+    
+    plot.save()
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+async def message_edit_up(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    order = request.path_params.get('msg_order')
+    if order is None or order == 0:
+        return HTMLResponse("not found", status_code=404)
+
+    plot.messages[order], plot.messages[order - 1] = plot.messages[order - 1], plot.messages[order]
+
+    for i, message in enumerate(plot.messages):
+        message: pyplot.Message
+        message.order = i
+    
+    plot.save()
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+async def message_edit_down(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    order = request.path_params.get('msg_order')
+    if order is None or order == len(plot.messages) - 1:
+        return HTMLResponse("not found", status_code=404)
+
+    plot.messages[order], plot.messages[order + 1] = plot.messages[order + 1], plot.messages[order]
+
+    for i, message in enumerate(plot.messages):
+        message: pyplot.Message
+        message.order = i
+    
+    plot.save()
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
 
 async def plot_explore(request):
     # recursivly search for .plot or .pyplot files
