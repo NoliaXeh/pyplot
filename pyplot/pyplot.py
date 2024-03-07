@@ -260,7 +260,7 @@ class PlotParser:
         """
         # extract the json data from the message content, if any
         if '{' not in message.content:
-            title = message.content.strip().split(' ')[0] if ' ' in message.content else message.content
+            title = message.content.strip().split()[0] if ' ' in message.content else message.content
             message.title = title
             message.content = message.content.strip()[len(title):].strip()
             message.data = {}

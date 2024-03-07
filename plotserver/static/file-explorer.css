@@ -33,13 +33,6 @@
   overflow-x: hidden;
 }
 
-.file-explorer .buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-}
 
 .file-explorer a.selected {
   background-color: #98ccff;

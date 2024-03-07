@@ -12,7 +12,7 @@
     box-sizing: content-box;
 }
 
-.message, .message * {
+.message, .message *, .actor {
     --selected-color: #a9d4ff;
     --hover-color: #d2e8ff;
     transition: all 0.15s;
@@ -41,6 +41,19 @@
     position: relative;
     text-align: center;
 }
+
+.actor {
+    cursor: pointer;
+    padding-top: 10px;
+}
+
+.actor:hover {
+    background-color: var(--hover-color);
+}
+.actor.selected {
+    background-color: var(--selected-color);
+}
+
 
 .arrow {
     border-top: 3px solid var(--bg-color);
@@ -129,4 +142,17 @@
     width: 30px;
     position: relative;
     top: 10px;
+}
+.title {
+    display: none;
+}
+.message *[plt-sender] .title {
+    display: block;
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFFFFFAA;
+    padding: 3px;
 }

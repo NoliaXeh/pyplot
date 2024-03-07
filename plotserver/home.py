@@ -48,6 +48,64 @@ async def homepage(request):
 
     return HTMLResponse(resp)
 
+async def actor_edit(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/actor-edit.html')
+
+    actor_column = request.path_params.get('actor_column')
+    if actor_column is None:
+        return HTMLResponse("not found", status_code=404)
+
+    resp = template.render(actor=plot.actors[actor_column])
+
+    return HTMLResponse(resp)
+
+async def actor_edit_move_left(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    actor_column = request.path_params.get('actor_column')
+    if actor_column is None:
+        return HTMLResponse("not found", status_code=404)
+
+    if actor_column > 0 and len(plot.actors) > 1:
+        actor = plot.actors.pop(actor_column)
+        actor.column -= 1
+        plot.actors[actor_column-1].column += 1
+        plot.actors.insert(actor_column - 1, actor)
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+async def actor_edit_move_right(request):
+    plot = get_plot()
+    if type(plot) is HTMLResponse:
+        return plot
+
+    template = get_template('frag/plot.html')
+
+    actor_column = request.path_params.get('actor_column')
+    if actor_column is None:
+        return HTMLResponse("not found", status_code=404)
+
+    if actor_column < len(plot.actors) - 1 and len(plot.actors) > 1:
+        actor = plot.actors.pop(actor_column)
+        actor.column += 1
+        plot.actors[actor_column].column -= 1
+        plot.actors.insert(actor_column +1 , actor)
+
+    resp = template.render(plot=plot)
+
+    return HTMLResponse(resp)
+
+
 async def message_edit(request):
     plot = get_plot()
     if type(plot) is HTMLResponse:

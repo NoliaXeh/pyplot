@@ -2,7 +2,12 @@
     <style> #plot-{{plot.id}} * { --nb-actors: {{plot.actors|length}}; } </style>
     <div class="actors">
         {% for actor in plot.actors %}
-            <div class="actor">
+            <div class="actor" id="actor-{{actor.column}}"
+                hx-get="/actor-edit/{{plot.id}}/{{actor.column}}"
+                hx-target=".options-pannel"
+                hx-trigger="click"
+                hx-on:click="select_actor({{actor.column}})"
+            >
                 {{actor.name}}
             </div>
         {% endfor %}
@@ -39,6 +44,8 @@
                         plt-bydirectional="true"
                     {% endif %}
                     >
+                <div class="title">{{message.title}}</div>
+
                 <div class="line"></div>
                 <div class="arrow"></div>
                 </div>
@@ -48,9 +55,15 @@
     </div>
     <script>
         function select_message(order) {
-            console.log('select_message', order);
-            document.querySelector('.message.selected')?.classList.remove('selected');
+            for (let elem of document.querySelectorAll('*:not(.file-explorer) .selected'))
+                elem.classList.remove('selected');
             document.querySelector(`#message-${order}`).classList.add('selected');
+        }
+        function select_actor(column) {
+            console.log(select_actor, column)
+            for (let elem of document.querySelectorAll('*:not(.file-explorer) .selected'))
+                elem.classList.remove('selected');
+            document.querySelector(`#actor-${column}`).classList.add('selected');
         }
     </script>
 </div>
