@@ -58,6 +58,7 @@ async def actor_edit(request):
     actor_column = request.path_params.get('actor_column')
     if actor_column is None:
         return HTMLResponse("not found", status_code=404)
+    plot.save()
 
     resp = template.render(actor=plot.actors[actor_column])
 
@@ -79,6 +80,7 @@ async def actor_edit_move_left(request):
         actor.column -= 1
         plot.actors[actor_column-1].column += 1
         plot.actors.insert(actor_column - 1, actor)
+        plot.save()
 
     resp = template.render(plot=plot)
 
@@ -100,6 +102,7 @@ async def actor_edit_move_right(request):
         actor.column += 1
         plot.actors[actor_column].column -= 1
         plot.actors.insert(actor_column +1 , actor)
+        plot.save()
 
     resp = template.render(plot=plot)
 
@@ -116,6 +119,7 @@ async def message_edit(request):
     order = request.path_params.get('msg_order')
     if order is None:
         return HTMLResponse("not found", status_code=404)
+    plot.save()
 
     resp = template.render(message=plot.messages[order])
 
@@ -140,6 +144,7 @@ async def message_edit_from_to(request):
     if msg_to != msg_from:
         plot.messages[order].sender = plot.actors[msg_from]
         plot.messages[order].receiver = plot.actors[msg_to]
+        plot.save()
 
     resp = template.render(plot=plot)
 
@@ -148,11 +153,15 @@ async def message_edit_from_to(request):
 async def plot_explore(request):
     # recursivly search for .plot or .pyplot files
     def find_files(path):
+        res = {}
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith(".plot") or file.endswith(".pyplot"):
                     yield os.path.join(root, file)
-    files = list(find_files("scenarios"))
+                    if root not in res:
+                        res[root] = []
+                    res[root].append(file)
+    files = list(find_files("."))
 
     template = get_template('frag/plot-explorer.html')
 

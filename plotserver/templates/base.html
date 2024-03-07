@@ -29,7 +29,7 @@
 
         </div>
         <div class="plot-pannel">
-            {% include 'frag/plot.html'%}
+            {% if plot %} {% include 'frag/plot.html'%} {% endif %}
         </div>
         <div class="options-pannel">
         </div>

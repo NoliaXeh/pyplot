@@ -9,17 +9,13 @@
         <input type="hidden" name="order" value="{{message.order}}"></input>
         <select name="from" id="from-actors-select">
             {% for actor in message.sender.plot.actors %}
-                {% if actor != message.sender %}
-                    <option value="{{ actor.column }}" {% if actor.column == message.sender.column %} selected {% endif %} >{{ actor }}</option>
-                {% endif %}
+                <option value="{{ actor.column }}" {% if actor.column == message.sender.column %} selected {% endif %} >{{ actor }}</option>
             {% endfor %}
         </select>
         <i class="fa-solid fa-arrow-right"></i>
         <select name="to" id="to-actors-select">
             {% for actor in message.sender.plot.actors %}
-                {% if actor != message.reciever %}
-                    <option value="{{ actor.column }}" {% if actor.column == message.receiver.column %} selected {% endif %} >{{ actor }}</option>
-                {% endif %}
+                <option value="{{ actor.column }}" {% if actor.column == message.receiver.column %} selected {% endif %} >{{ actor }}</option>
             {% endfor %}
         </select>
     </form>

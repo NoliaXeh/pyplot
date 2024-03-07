@@ -119,6 +119,12 @@ class Plot:
             lines.append(empty_line)
         return '\n'.join(lines)
 
+    def save(self, filename: str | None = None):
+        if filename is None:
+            filename = self.filename
+        with open(filename, 'w') as file:
+            file.write(self.export())
+
 @dataclass
 class Actor:
     """

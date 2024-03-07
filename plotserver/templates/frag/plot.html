@@ -55,13 +55,13 @@
     </div>
     <script>
         function select_message(order) {
-            for (let elem of document.querySelectorAll('*:not(.file-explorer) .selected'))
+            for (let elem of document.querySelectorAll('.plot .selected'))
                 elem.classList.remove('selected');
             document.querySelector(`#message-${order}`).classList.add('selected');
         }
         function select_actor(column) {
             console.log(select_actor, column)
-            for (let elem of document.querySelectorAll('*:not(.file-explorer) .selected'))
+            for (let elem of document.querySelectorAll('.plot .selected'))
                 elem.classList.remove('selected');
             document.querySelector(`#actor-${column}`).classList.add('selected');
         }
