@@ -9,6 +9,8 @@ def main():
         print (e)
         return 1
 
+    print(plot.export())
+
     print(pyplot.play(plot))
 
 #@pyplot.action

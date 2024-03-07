@@ -69,6 +69,53 @@ class Plot:
                 return True
         return False
 
+    def export(self) -> str:
+        lines = []
+        actor_max_width = max([len(actor.name) for actor in self.actors])
+        column_width = max(actor_max_width, 15)
+        head = (' ' * (max(column_width - actor_max_width, 1))).join([actor.name for actor in self.actors])
+        lines.append(head)
+        arrow_right = '-' * (column_width - 1) + '>'
+        arrow_left = '<' + '-' * (column_width - 1)
+        arrow_both = '<' + '-' * (column_width - 2) + '>'
+        arrow_blank = ' ' * column_width
+        arrow_line = '-' * column_width
+        empty_line = ('|' + arrow_blank) * (len(self.actors) - 1) + '|'
+        lines.append(empty_line)
+        for message in self.messages:
+            message: Message
+            sender_col = message.sender.column
+            receiver_col = message.receiver.column
+            left = min(sender_col, receiver_col)
+            right = max(sender_col, receiver_col)
+            line = ''
+            for afrom, ato in zip(self.actors, self.actors[1:]):
+                afrom : Actor
+                ato : Actor
+                if afrom.column == left and ato.column == right:
+                    line += '|' + arrow_both
+                elif afrom.column == left:
+                    line += '|' + arrow_left
+                elif ato.column == right:
+                    line += '-' + arrow_right
+                elif afrom.column > left and ato.column < right:
+                    line += '-' + arrow_line
+                else:
+                    line += '|' + arrow_blank
+            line += '|'
+            if not message.bydirectional:
+                to_replace = '<' if (message.sender.column < message.receiver.column) else '>'
+                line = line.replace(to_replace, '-')
+            line += ' '
+            if message.data:
+                line += message.title + ' ' + json.dumps(message.data, indent=4)
+            else:
+                line += message.title + ' ' + message.content
+            line = line.replace('\n', '\n' + empty_line + ' ')
+            lines.append(line)
+            lines.append(empty_line)
+        return '\n'.join(lines)
+
 @dataclass
 class Actor:
     """
@@ -247,6 +294,7 @@ class PlotParser:
             line (str): The line containing the data to be appended.
         """
         cnt = 0
+        i = 0
         for i, char in enumerate(line):
             if char == '|':
                 cnt += 1
