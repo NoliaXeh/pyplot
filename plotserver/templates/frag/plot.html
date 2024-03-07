@@ -8,7 +8,13 @@
                 hx-trigger="click"
                 hx-on:click="select_actor({{actor.column}})"
             >
-                {{actor.name}}
+            <div class="move">
+                <i class="fas fa-caret-left" hx-get="/actor-edit/move-left/{{actor.column}}" hx-target=".plot-pannel" hx-on:click="clear_options()"></i>
+            </div>
+            {{actor.name}}
+            <div class="move">
+                <i class="fas fa-caret-right" hx-get="/actor-edit/move-right/{{actor.column}}" hx-target=".plot-pannel" hx-on:click="clear_options()"></i>
+            </div>
             </div>
         {% endfor %}
     </div>
@@ -64,6 +70,11 @@
             for (let elem of document.querySelectorAll('.plot .selected'))
                 elem.classList.remove('selected');
             document.querySelector(`#actor-${column}`).classList.add('selected');
+        }
+        function clear_options() {
+            window.setTimeout(() => {
+                document.querySelector(".options-pannel").innerHTML = "";
+            }, 100);
         }
     </script>
 </div>

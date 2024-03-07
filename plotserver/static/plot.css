@@ -12,7 +12,7 @@
     box-sizing: content-box;
 }
 
-.message, .message *, .actor {
+.message, .message *, .actor, .actor * {
     --selected-color: #a9d4ff;
     --hover-color: #d2e8ff;
     transition: all 0.15s;
@@ -46,10 +46,29 @@
     cursor: pointer;
     padding-top: 10px;
 }
+.actor .move {
+    display: none;
+}
 
 .actor:hover {
     background-color: var(--hover-color);
 }
+.actor:hover .move {
+    display: inline;
+    position: relative;
+    margin: 0 20px;
+}
+
+.actor:hover .move i {
+    height: 30px;
+    position: absolute;
+    top: 1px;
+}
+.actor:hover i:hover {
+    font-size: 30px;
+    transform: translate(-5px, -5px);
+}
+
 .actor.selected {
     background-color: var(--selected-color);
 }

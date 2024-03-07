@@ -4,16 +4,8 @@
     hx-ext="json-enc"
     hx-target=".plot-pannel"
 >
-    <div class="buttons">
-        <button hx-get="/actor-edit/move-left/{{actor.column}}" hx-target=".plot-pannel" hx-on:click="clear_options()" ><i class="fa-solid fa-arrow-left"></i></button>
-        <button hx-get="/actor-edit/move-right/{{actor.column}}" hx-target=".plot-pannel" hx-on:click="clear_options()" ><i class="fa-solid fa-arrow-right"></i></button>
-    </div>
+
     <h1> <input type="text" value="{{actor.name}}"/> </h1>
     <textarea>{{actor.data|json}}</textarea>
-    <script>
-        function clear_options() {
-            console.log("clean")
-            document.querySelector(".options-pannel").innerHTML = "";
-        }
-    </script>
+
 </form>
